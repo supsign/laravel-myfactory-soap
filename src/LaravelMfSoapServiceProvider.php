@@ -1,6 +1,6 @@
 <?php
 
-namespace Supsign\LaravelMfSoap;
+namespace Supsign\LaravelMfSoap\LaravelMfSoap;
 
 use Illuminate\Support\ServiceProvider;
 
