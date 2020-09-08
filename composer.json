@@ -7,5 +7,16 @@
     {
         "name": "Fabrizio Cocco",
         "email": "fabrizio.cocco@supsign.ch"
-    }]
+    }],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Barryvdh\\Debugbar\\ServiceProvider"
+            ],
+            "aliases": {
+                "Debugbar": "Barryvdh\\Debugbar\\Facade"
+            }
+        }
+    }
 }
+
