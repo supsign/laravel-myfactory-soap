@@ -1,0 +1,11 @@
+{
+    "name": "supsign/laravel-mf-soap",
+    "description": "Laravel Extension for Handling SOAP for myFactory",
+    "keywords": ["composer", "script", "myFactory"],
+    "license": "MIT",
+    "authors": [
+    {
+        "name": "Fabrizio Cocco",
+        "email": "fabrizio.cocco@supsign.ch"
+    }]
+}
