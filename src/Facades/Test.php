@@ -1,6 +1,6 @@
 <?php
 
-namespace Supsign\LaravelMyfactorySoap\Facades;
+namespace Supsign\LaravelMfSoap\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

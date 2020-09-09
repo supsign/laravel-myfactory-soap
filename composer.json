@@ -11,10 +11,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Supsign\\LaravelMyfactorySoap\\LaravelMyfactorySoapServiceProvider"
+                "Supsign\\LaravelMfSoap\\LaravelMfSoapServiceProvider"
             ],
             "aliases": {
-                "Test": "Supsign\\LaravelMyfactorySoap\\Facades\\Test"
+                "Test": "Supsign\\LaravelMfSoap\\Facades\\Test"
             }
         }
     }
