@@ -8,6 +8,11 @@
         "name": "Fabrizio Cocco",
         "email": "fabrizio.cocco@supsign.ch"
     }],
+    "autoload": {
+        "psr-4": {
+            "Supsign\\LaravelMfSoap\\": "src/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
