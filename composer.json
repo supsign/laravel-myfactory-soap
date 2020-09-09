@@ -12,8 +12,10 @@
         "laravel": {
             "providers": [
                 "Supsign\\LaravelMfSoap\\LaravelMfSoapServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Debugbar": "Barryvdh\\Debugbar\\Facade"
+            }
         }
     }
 }
-
