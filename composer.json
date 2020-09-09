@@ -12,10 +12,7 @@
         "laravel": {
             "providers": [
                 "Supsign\\LaravelMfSoap\\LaravelMfSoapServiceProvider"
-            ],
-            "aliases": {
-                "Test": "Supsign\\LaravelMfSoap\\Facades\\Test"
-            }
+            ]
         }
     }
 }
