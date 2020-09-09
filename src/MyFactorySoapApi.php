@@ -6,24 +6,29 @@ use Config;
 
 class MyFactorySoapApi
 {
-    private
-        $wsdl        = null,
+    protected
         $client      = null,
-        $response    = null,
-        $authParams  = array(),
-        $loginParams = array('trace' => 1);
+        $request     = array(),
+        $response    = null;
 
 	public function __construct() {
-		$this->wsdl = env('MF_API_WSDL');
-		$this->loginParams['login'] = env('MF_API_LOGIN');
-		$this->loginParams['password'] = env('MF_API_PASSWORD');
+		$this->request['UserName'] = env('MF_API_LOGIN');
+		$this->request['Password'] = env('MF_API_PASSWORD');
 
-		$this->client = new \SoapClient($this->wsdl, $this->loginParams);
+		$this->client = new \SoapClient(env('MF_API_WSDL'));
 
-		var_dump($this->client);
+		return $this;
 	}
 
+    public function getResponse() {
+        return $this->response;
+    }
 
+    public function test() {
+		$this->response = $this->client->GetCustomers($this->request);
 
+    	var_dump($this->client->__getLastRequest()  );
 
+    	return $this;
+    }
 }
