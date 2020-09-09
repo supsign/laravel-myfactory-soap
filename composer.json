@@ -11,7 +11,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Supsign\\LaravelMfSoap\\LaravelMfSoapServiceProvider"
+                "Supsign\\LaravelMyfactorySoap\\LaravelMyfactorySoapServiceProvider"
             ],
             "aliases": {
                 "Debugbar": "Barryvdh\\Debugbar\\Facade"
