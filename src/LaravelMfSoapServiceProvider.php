@@ -1,10 +1,10 @@
 <?php
 
-namespace Supsign\LaravelMfSoap\LaravelMfSoap;
+namespace Supsign\LaravelMyfactorySoap;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelMfSoapServiceProvider extends ServiceProvider
+class LaravelMyfactorySoapServiceProvider extends ServiceProvider
 {
 
     public function boot() 
