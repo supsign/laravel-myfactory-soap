@@ -14,7 +14,7 @@
                 "Supsign\\LaravelMyfactorySoap\\LaravelMyfactorySoapServiceProvider"
             ],
             "aliases": {
-                "Debugbar": "Barryvdh\\Debugbar\\Facade"
+                "Test": "Supsign\\LaravelMyfactorySoap\\Facades\\Test"
             }
         }
     }
