@@ -14,7 +14,6 @@ class MyFactorySoapApi
 	public function __construct() {
 		$this->request['UserName'] = env('MF_API_LOGIN');
 		$this->request['Password'] = env('MF_API_PASSWORD');
-
 		$this->client = new \SoapClient(env('MF_API_WSDL'));
 
 		return $this;
@@ -32,7 +31,13 @@ class MyFactorySoapApi
 		return $this;
 	}
 
-	public function getProduct(array $requestData) {			// keys:	ProductID, ProductNumber
+	public function createProduct(array $requestData)
+	{
+		$this->setRequestData($requestData);
+
+	}
+
+	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
 		$this->setRequestData($requestData);
 
 		switch (true) {
@@ -49,7 +54,7 @@ class MyFactorySoapApi
 		}
 	}
 
-	public function getProducts(array $requestData) {			// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
+	public function getProducts(array $requestData) {					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
 		$this->setRequestData($requestData);
 
 		$this->response = array_key_exists('GetProducts', $this->request)
@@ -70,6 +75,43 @@ class MyFactorySoapApi
     		->request = array_merge($this->request, $data);
 
     	return $this;
+    }
+
+    protected function setUpdateProductDefaultRequestData() {
+    	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
+    		throw new \Exception('missing request parameter', 1);
+    	}
+
+    	$tmpRequest = $this->request;
+
+		$product = isset($this->request['Product']['ProductID']) 
+			? $this->getProduct(['ProductID' => $this->request['Product']['ProductID']])
+			: $this->getProduct(['ProductNumber' => $this->request['Product']['ProductNumber']]);
+
+		$this->request = $tmpRequest;
+
+    	$requiredFields = array('ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight');
+
+    	foreach ($requiredFields AS $field) {
+    		if (!isset($this->request['Product'][$field])) {
+    			$this->request['Product'][$field] = $product->{$field};
+    		}
+    	}
+
+    	return $this;
+    }
+
+    public function updateProduct(array $requestData, $put = false)		//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
+    {    	
+		$this
+			->setRequestData($requestData)
+			->setUpdateProductDefaultRequestData();
+
+		var_dump($this->request); die();
+
+		$this->response = $this->client->UpdateProduct($this->request);
+
+		return $this;
     }
 
     public function test() {
