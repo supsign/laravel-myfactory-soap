@@ -43,6 +43,14 @@ class MyFactorySoapApi
 		return $this->updateProduct($requestData, true);
 	}
 
+	public function getAddresses(array $requestData = []) {				// keys:	AddressID, AddressNumber, Name1, Name2, ....
+		$this
+			->setRequestData(['AddressCondition' => $requestData])
+			->response = $this->client->GetAddresses($this->request);	//	gibts nicht, lol?
+
+		return $this->response;
+	}
+
 	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
 		$this->setRequestData($requestData);
 
@@ -63,7 +71,7 @@ class MyFactorySoapApi
 	public function getProducts(array $requestData) {					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
 		$this->setRequestData($requestData);
 
-		$this->response = array_key_exists('GetProducts', $this->request)
+		$this->response = array_key_exists('GetDocuments', $this->request)
 			? $this->client->GetProductsIndividual($this->request)
 			: $this->client->GetProducts($this->request);
 
@@ -107,7 +115,7 @@ class MyFactorySoapApi
 
     public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
     {    	
-		$this->setRequestData($requestData);
+		$this->setRequestData(['Product' => $requestData]);
 		$this->response = $put
 			? $this->client->PutProduct($this->request)
 			: $this->setUpdateProductDefaultRequestData()->client->UpdateProduct($this->request);
@@ -116,10 +124,6 @@ class MyFactorySoapApi
     }
 
     public function test() {
-
-
-
-
     	// $this->request['CustomerID'] = 13;
     	// $this->request['ChangeDate'] = '2020-07-01';
 
