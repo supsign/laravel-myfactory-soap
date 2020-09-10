@@ -7,9 +7,12 @@ use Config;
 class MyFactorySoapApi
 {
     protected
-        $client   	= null,
-        $request   	= array(),
-        $response  	= null;
+        $client = null,
+        $request = array(),
+        $requiredFields	= array(
+        	'ProductUpdate' => ['ProductID', 'ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight']
+        ),
+        $response = null;
 
 	public function __construct() {
 		$this->request['UserName'] = env('MF_API_LOGIN');
@@ -31,10 +34,13 @@ class MyFactorySoapApi
 		return $this;
 	}
 
-	public function createProduct(array $requestData)
+	public function createProduct(array $requestData)					//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
 	{
-		$this->setRequestData($requestData);
+		if (!isset($requestData['Product']['ProductNumber'])) {
+			$requestData['Product']['ProductNumber'] = '*';
+		}
 
+		return $this->updateProduct($requestData, true);
 	}
 
 	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
@@ -90,9 +96,7 @@ class MyFactorySoapApi
 
 		$this->request = $tmpRequest;
 
-    	$requiredFields = array('ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight');
-
-    	foreach ($requiredFields AS $field) {
+    	foreach ($this->requiredFields['ProductUpdate'] AS $field) {
     		if (!isset($this->request['Product'][$field])) {
     			$this->request['Product'][$field] = $product->{$field};
     		}
@@ -101,15 +105,12 @@ class MyFactorySoapApi
     	return $this;
     }
 
-    public function updateProduct(array $requestData, $put = false)		//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
+    public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
     {    	
-		$this
-			->setRequestData($requestData)
-			->setUpdateProductDefaultRequestData();
-
-		var_dump($this->request); die();
-
-		$this->response = $this->client->UpdateProduct($this->request);
+		$this->setRequestData($requestData);
+		$this->response = $put
+			? $this->client->PutProduct($this->request)
+			: $this->setUpdateProductDefaultRequestData()->client->UpdateProduct($this->request);
 
 		return $this;
     }
