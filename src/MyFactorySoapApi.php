@@ -38,11 +38,11 @@ class MyFactorySoapApi
 		switch (true) {
 			case array_key_exists('ProductID', $this->request):
 				$this->response = $this->client->GetProductByProductID($this->request);
-				return $this->response->GetProductByProductIDResult;
+				return $this->response->GetProductByProductIDResult->Product;
 
 			case array_key_exists('ProductNumber', $this->request):
 				$this->response = $this->client->GetProductByProductNumber($this->request);
-				return $this->response->GetProductByProductNumberResult;
+				return $this->response->GetProductByProductNumberResult->Product;
 
 			default:
 				throw new \Exception('missing request parameter', 1);
