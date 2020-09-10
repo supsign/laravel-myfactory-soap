@@ -78,6 +78,15 @@ class MyFactorySoapApi
 		return $this->getResponse()->GetProductsResult->Products->Product;
 	}
 
+	public function getProductStockInfos(array $requestData)
+	{
+		$this
+			->setRequestData($requestData)
+			->response = $this->client->GetProductStockInfos($this->request);
+
+		return $this->response;
+	}
+
     public function getResponse() {
         return $this->response;
     }
