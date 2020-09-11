@@ -51,10 +51,24 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
+	public function getDiscountLists()
+	{
+		$this->response = $this->client->GetDiscountLists($this->request);
+
+		return $this->response->GetDiscountListsResult->DiscountLists->DiscountList;
+	}
+
 	public function getMainSuppliers() {
 		$this->response = $this->client->GetMainSuppliers($this->request);
 
 		return $this->response->GetMainSuppliersResult->Suppliers->Supplier;
+	}
+
+	public function getPriceLists()
+	{
+		$this->response = $this->client->GetPriceLists($this->request);
+
+		return $this->response->GetPriceListsResult->PriceLists->PriceList;
 	}
 
 	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
@@ -154,16 +168,5 @@ class MyFactorySoapApi
 			: $this->setUpdateProductDefaultRequestData()->client->UpdateProduct($this->request);
 
 		return $this;
-    }
-
-    public function test() {
-    	// $this->request['CustomerID'] = 13;
-    	// $this->request['ChangeDate'] = '2020-07-01';
-
-		// $this->response = $this->client->GetCustomers($this->request);
-		// $this->response = $this->client->GetProducts($this->request);
-		// $this->response = $this->client->GetUsers($this->request);
-
-    	return $this;
     }
 }
