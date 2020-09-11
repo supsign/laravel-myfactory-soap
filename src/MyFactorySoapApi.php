@@ -51,6 +51,13 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
+	public function getCountries()
+	{
+		$this->response = $this->client->GetCountries($this->request);
+
+		return $this->response->GetCountriesResult->Countries->Country;
+	}
+
 	public function getDiscountLists()
 	{
 		$this->response = $this->client->GetDiscountLists($this->request);
@@ -62,6 +69,13 @@ class MyFactorySoapApi
 		$this->response = $this->client->GetMainSuppliers($this->request);
 
 		return $this->response->GetMainSuppliersResult->Suppliers->Supplier;
+	}
+
+	public function getPaymentConditions()
+	{
+		$this->response = $this->client->GetPaymentConditions($this->request);
+
+		return $this->response->GetPaymentConditionsResult->PaymentConditions->PaymentCondition;
 	}
 
 	public function getPriceLists()
@@ -117,6 +131,13 @@ class MyFactorySoapApi
     	$this->response = $this->setUpdateProductDefaultRequestData()->client->GetProductSuppliers($this->request);
 
     	return $this->response;
+	}
+
+	public function getShippingConditions()
+	{
+		$this->response = $this->client->GetShippingConditions($this->request);
+
+		return $this->response->GetShippingConditionsResult->ShipmentConditions->ShipmentCondition;
 	}
 
 	public function getSuppliers() {
