@@ -133,6 +133,10 @@ class MyFactorySoapApi
     	return $this->response;
 	}
 
+    public function getResponse() {
+        return $this->response;
+    }
+
 	public function getShippingConditions()
 	{
 		$this->response = $this->client->GetShippingConditions($this->request);
@@ -146,9 +150,12 @@ class MyFactorySoapApi
 		return $this->response->GetSuppliersResult->Suppliers->Supplier;
 	}
 
-    public function getResponse() {
-        return $this->response;
-    }
+	public function getTaxations()
+	{
+		$this->response = $this->client->GetTaxations($this->request);
+
+		return $this->response->GetTaxationsResult->Taxations->Taxation;
+	}
 
     protected function setRequestData(array $data)
     {
