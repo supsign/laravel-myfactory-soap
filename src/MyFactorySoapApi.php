@@ -51,6 +51,12 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
+	public function getMainSuppliers() {
+		$this->response = $this->client->GetMainSuppliers($this->request);
+
+		return $this->response->GetMainSuppliersResult->Suppliers->Supplier;
+	}
+
 	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
 		$this->setRequestData($requestData);
 
@@ -85,6 +91,24 @@ class MyFactorySoapApi
 			->response = $this->client->GetProductStockInfos($this->request);
 
 		return $this->response;
+	}
+
+	public function getProductSuppliers(array $requestData) {
+		$this->setRequestData(['Product' => $requestData]);
+
+    	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
+    		throw new \Exception('missing request parameter', 1);
+    	}
+
+    	$this->response = $this->setUpdateProductDefaultRequestData()->client->GetProductSuppliers($this->request);
+
+    	return $this->response;
+	}
+
+	public function getSuppliers() {
+		$this->response = $this->client->GetSuppliers($this->request);
+
+		return $this->response->GetSuppliersResult->Suppliers->Supplier;
 	}
 
     public function getResponse() {
