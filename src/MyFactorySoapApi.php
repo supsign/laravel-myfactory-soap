@@ -14,7 +14,8 @@ class MyFactorySoapApi
         ),
         $response = null;
 
-	public function __construct() {
+	public function __construct() 
+	{
 		$this->request['UserName'] = env('MF_API_LOGIN');
 		$this->request['Password'] = env('MF_API_PASSWORD');
 		$this->client = new \SoapClient(env('MF_API_WSDL'));
@@ -22,7 +23,8 @@ class MyFactorySoapApi
 		return $this;
 	}
 
-	protected function clearRequestData() {
+	protected function clearRequestData() 
+	{
 		foreach ($this->request AS $key => $value) {
 			if ($key == 'UserName' OR $key == 'Password') {
 				continue;
@@ -43,7 +45,8 @@ class MyFactorySoapApi
 		return $this->updateProduct($requestData, true);
 	}
 
-	public function getAddresses(array $requestData = []) {				// keys:	AddressID, AddressNumber, Name1, Name2, ....
+	public function getAddresses(array $requestData = []) 				// keys:	AddressID, AddressNumber, Name1, Name2, ....
+	{				
 		$this
 			->setRequestData(['AddressCondition' => $requestData])
 			->response = $this->client->GetAddresses($this->request);	//	gibts nicht, lol?
@@ -65,7 +68,8 @@ class MyFactorySoapApi
 		return $this->response->GetDiscountListsResult->DiscountLists->DiscountList;
 	}
 
-	public function getMainSuppliers() {
+	public function getMainSuppliers() 
+	{
 		$this->response = $this->client->GetMainSuppliers($this->request);
 
 		return $this->response->GetMainSuppliersResult->Suppliers->Supplier;
@@ -85,7 +89,8 @@ class MyFactorySoapApi
 		return $this->response->GetPriceListsResult->PriceLists->PriceList;
 	}
 
-	public function getProduct(array $requestData) {					// keys:	ProductID, ProductNumber
+	public function getProduct(array $requestData) 						// keys:	ProductID, ProductNumber
+	{					
 		$this->setRequestData($requestData);
 
 		switch (true) {
@@ -102,7 +107,8 @@ class MyFactorySoapApi
 		}
 	}
 
-	public function getProducts(array $requestData) {					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
+	public function getProducts(array $requestData) 					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
+	{					
 		$this->setRequestData($requestData);
 
 		$this->response = array_key_exists('GetDocuments', $this->request)
@@ -121,20 +127,31 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
-	public function getProductSuppliers(array $requestData) {
+	public function getProductSuppliers(array $requestData) 
+	{
 		$this->setRequestData(['Product' => $requestData]);
 
     	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
     		throw new \Exception('missing request parameter', 1);
     	}
 
-    	$this->response = $this->setUpdateProductDefaultRequestData()->client->GetProductSuppliers($this->request);
+    	$this->response = $this->setProductUpdateDefaultRequestData()->client->GetProductSuppliers($this->request);
 
     	return $this->response;
 	}
 
-    public function getResponse() {
+    public function getResponse() 
+    {
         return $this->response;
+    }
+
+    public function getSalesOrders(array $requestData) 
+    {
+		$this
+			->setRequestData($requestData)
+			->response = $this->client->GetSalesOrders($this->request);
+
+		return $this->response->GetSalesOrdersResult->Orders->Order;
     }
 
 	public function getShippingConditions()
@@ -144,7 +161,8 @@ class MyFactorySoapApi
 		return $this->response->GetShippingConditionsResult->ShipmentConditions->ShipmentCondition;
 	}
 
-	public function getSuppliers() {
+	public function getSuppliers() 
+	{
 		$this->response = $this->client->GetSuppliers($this->request);
 
 		return $this->response->GetSuppliersResult->Suppliers->Supplier;
@@ -166,7 +184,8 @@ class MyFactorySoapApi
     	return $this;
     }
 
-    protected function setUpdateProductDefaultRequestData() {
+    protected function setProductUpdateDefaultRequestData() 
+    {
     	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
     		throw new \Exception('missing request parameter', 1);
     	}
@@ -190,10 +209,11 @@ class MyFactorySoapApi
 
     public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
     {    	
-		$this->setRequestData(['Product' => $requestData]);
-		$this->response = $put
-			? $this->client->PutProduct($this->request)
-			: $this->setUpdateProductDefaultRequestData()->client->UpdateProduct($this->request);
+		$this
+			->setRequestData(['Product' => $requestData])
+			->response = $put
+				? $this->client->PutProduct($this->request)
+				: $this->setProductUpdateDefaultRequestData()->client->UpdateProduct($this->request);
 
 		return $this;
     }
