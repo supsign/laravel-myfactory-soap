@@ -96,6 +96,12 @@ class MyFactorySoapApi
 		switch (true) {
 			case array_key_exists('ProductID', $this->request):
 				$this->response = $this->client->GetProductByProductID($this->request);
+
+				if (!isset($this->response->GetProductByProductIDResult->Product)) {
+					var_dump($requestData, $this->response);
+					die();
+				}
+
 				return $this->response->GetProductByProductIDResult->Product;
 
 			case array_key_exists('ProductNumber', $this->request):
@@ -145,13 +151,35 @@ class MyFactorySoapApi
         return $this->response;
     }
 
+    public function getSalesOrder(array $requestData) 
+    {
+    	if (!isset($requestData['OrderID'])) {
+    		throw new \Exception('missing request parameter', 1);
+    	}
+
+		$this
+			->setRequestData($requestData)
+			->response = $this->client->GetSalesOrder($this->request);
+
+		return $this->response->GetSalesOrderResult->Order;
+    }
+
     public function getSalesOrders(array $requestData) 
     {
+    	if (!isset($requestData['OrderDate'])) {
+    		throw new \Exception('missing request parameter', 1);
+    	}
+
 		$this
 			->setRequestData($requestData)
 			->response = $this->client->GetSalesOrders($this->request);
 
 		return $this->response->GetSalesOrdersResult->Orders->Order;
+    }
+
+    public function getSalesOrderPosition() 
+    {
+
     }
 
 	public function getShippingConditions()
