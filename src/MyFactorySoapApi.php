@@ -16,9 +16,9 @@ class MyFactorySoapApi
 
 	public function __construct() 
 	{
-		$this->request['UserName'] = env('MF_API_LOGIN');
-		$this->request['Password'] = env('MF_API_PASSWORD');
-		$this->client = new \SoapClient(env('MF_API_WSDL'));
+		$this->request['UserName'] = env('MF_SOAP_LOGIN');
+		$this->request['Password'] = env('MF_SOAP_PASSWORD');
+		$this->client = new \SoapClient(env('MF_SOAP_WSDL'));
 
 		return $this;
 	}
