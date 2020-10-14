@@ -8,6 +8,7 @@ class MyFactorySoapApi
 {
     protected
         $client = null,
+        $cache = array(),
         $request = array(),
         $requiredFields	= array(
         	'ProductUpdate' => ['ProductID', 'ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight']
@@ -177,9 +178,23 @@ class MyFactorySoapApi
 		return $this->response->GetSalesOrdersResult->Orders->Order;
     }
 
-    public function getSalesOrderPosition() 
+    public function getSalesOrderPosition(array $requestData) 
     {
+    	$salesOrder = $this->getSalesOrder(['OrderID' => $requestData['OrderID']]);
 
+    	var_dump($salesOrder);
+
+    	return;
+
+    	foreach ($salesOrder->OrderPositions AS $orderPosition) {
+    		var_dump($orderPosition);
+
+    		if ($orderPosition->OrderPosID == $requestData['OrderPositionID']) {
+    			return $orderPosition;
+    		}
+    	}
+ 
+ 		throw new \Exception('position not found', 1);
     }
 
 	public function getShippingConditions()
@@ -196,11 +211,30 @@ class MyFactorySoapApi
 		return $this->response->GetSuppliersResult->Suppliers->Supplier;
 	}
 
+	public function getTaxFactorByKey($key) {
+		return $this->getTaxRateByKey($key) / 100 + 1;
+	}
+
+	public function getTaxRateByKey($key)
+	{
+		foreach ($this->getTaxations() AS $taxation) {
+			if ($taxation->TaxKey == $key) {
+				return $taxation->TaxRate;
+			}
+		}
+
+		throw new \Exception('taxRate not found', 1);
+	}
+
 	public function getTaxations()
 	{
+		if (isset($this->cache['taxation'])) {
+			return $this->cache['taxation'];
+		}
+
 		$this->response = $this->client->GetTaxations($this->request);
 
-		return $this->response->GetTaxationsResult->Taxations->Taxation;
+		return $this->cache['taxation'] = $this->response->GetTaxationsResult->Taxations->Taxation;
 	}
 
     protected function setRequestData(array $data)
