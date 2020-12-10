@@ -6,9 +6,12 @@ use Config;
 
 class MyFactorySoapApi
 {
+	public $client = null;
+
     protected
-        $client = null,
+        // $client = null,
         $cache = array(),
+        $error = array('missing_parameter' => 'missing request parameter'),
         $request = array(),
         $requiredFields	= array(
         	'ProductUpdate' => ['ProductID', 'ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight']
@@ -19,7 +22,7 @@ class MyFactorySoapApi
 	{
 		$this->request['UserName'] = env('MF_SOAP_LOGIN');
 		$this->request['Password'] = env('MF_SOAP_PASSWORD');
-		$this->client = new \SoapClient(env('MF_SOAP_WSDL'));
+		$this->client = new \SoapClient(env('MF_SOAP_WSDL'), ['trace' => true]);
 
 		return $this;
 	}
@@ -110,7 +113,7 @@ class MyFactorySoapApi
 				return $this->response->GetProductByProductNumberResult->Product;
 
 			default:
-				throw new \Exception('missing request parameter', 1);
+				throw new \Exception($this->error['missing_parameter'], 1);
 		}
 	}
 
@@ -140,24 +143,11 @@ class MyFactorySoapApi
 			throw new \Exception('missing request parameter', 1);
 		}
 
-		if (!isset($requestData['SupplierID'])) {
-			if ($this->getProduct($requestData)->MainSupplier == 0) {
-				return null;
-			}
-
-			$requestData['SupplierID'] = $this->getProduct($requestData)->MainSupplier; 
-		}
-
-		foreach ($requestData AS $key => $value) {
-			if (in_array($key, ['ProductID', 'ProductNumber'])) {
-				$requestData['Product'][$key] = $value;
-				unset($requestData[$key]);
-			}
-		}
-
-    	$this->response = $this->setRequestData($requestData)->client->GetProductSupplierInformations($this->request)->GetProductSupplierInformationsResult->ProductSupplierInformations->ProductSupplierInformation;
-
-    	return $this->response;
+		return $this->response = $this
+			->setRequestData($requestData)
+			->client
+				->GetProductSupplierInformations($this->request)
+					->GetProductSupplierInformationsResult->ProductSupplierInformations->ProductSupplierInformation;
 	}
 
 	public function getProductSuppliers(array $requestData) 
@@ -165,10 +155,13 @@ class MyFactorySoapApi
 		$this->setRequestData(['Product' => $requestData]);
 
     	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
-    		throw new \Exception('missing request parameter', 1);
+    		throw new \Exception($this->error['missing_parameter'], 1);
     	}
 
-    	$this->response = $this->setProductUpdateDefaultRequestData()->client->GetProductSuppliers($this->request);
+    	$this->response = $this
+    		->setProductUpdateDefaultRequestData()
+    		->client
+    			->GetProductSuppliers($this->request);
 
     	return $this->response;
 	}
@@ -181,7 +174,7 @@ class MyFactorySoapApi
     public function getSalesOrder(array $requestData) 
     {
     	if (!isset($requestData['OrderID'])) {
-    		throw new \Exception('missing request parameter', 1);
+    		throw new \Exception($this->error['missing_parameter'], 1);
     	}
 
 		$this
@@ -194,7 +187,7 @@ class MyFactorySoapApi
     public function getSalesOrders(array $requestData) 
     {
     	if (!isset($requestData['OrderDate'])) {
-    		throw new \Exception('missing request parameter', 1);
+    		throw new \Exception($this->error['missing_parameter'], 1);
     	}
 
 		$this
@@ -208,13 +201,7 @@ class MyFactorySoapApi
     {
     	$salesOrder = $this->getSalesOrder(['OrderID' => $requestData['OrderID']]);
 
-    	var_dump($salesOrder);
-
-    	return;
-
     	foreach ($salesOrder->OrderPositions AS $orderPosition) {
-    		var_dump($orderPosition);
-
     		if ($orderPosition->OrderPosID == $requestData['OrderPositionID']) {
     			return $orderPosition;
     		}
@@ -275,7 +262,7 @@ class MyFactorySoapApi
     protected function setProductUpdateDefaultRequestData() 
     {
     	if (!isset($this->request['Product']['ProductID']) AND !isset($this->request['Product']['ProductNumber'])) {
-    		throw new \Exception('missing request parameter', 1);
+    		throw new \Exception($this->error['missing_parameter'], 1);
     	}
 
     	$tmpRequest = $this->request;
