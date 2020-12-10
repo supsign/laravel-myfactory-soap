@@ -137,17 +137,24 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
-	public function getProductSupplierInformation(array $requestData) 
+	public function getProductSupplierInformation(array $requestData)
 	{
-		if (!isset($requestData['ProductID']) AND !isset($requestData['ProductNumber']) AND !isset($requestData['SupplierID'])) {
+		//	!isset($requestData['ProductID']) AND !isset($requestData['ProductNumber'])
+
+		if (!isset($requestData['SupplierID'])) {
 			throw new \Exception('missing request parameter', 1);
 		}
 
-		return $this->response = $this
+		$result = $this
 			->setRequestData($requestData)
 			->client
-				->GetProductSupplierInformations($this->request)
-					->GetProductSupplierInformationsResult->ProductSupplierInformations->ProductSupplierInformation;
+				->GetProductSupplierInformations($this->request);
+
+		if (!isset($result->ProductSupplierInformations) OR is_object($result->ProductSupplierInformations) && !isset($result->ProductSupplierInformations->ProductSupplierInformation)) {
+			return [];
+		}
+
+		return $result->ProductSupplierInformations->ProductSupplierInformation;
 	}
 
 	public function getProductSuppliers(array $requestData) 
