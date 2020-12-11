@@ -139,20 +139,47 @@ class MyFactorySoapApi
 
 	public function getProductSupplierInformation(array $requestData)
 	{
-		//	!isset($requestData['ProductID']) AND !isset($requestData['ProductNumber'])
-
 		if (!isset($requestData['SupplierID'])) {
 			throw new \Exception('missing request parameter', 1);
 		}
 
-		$result = $this
-			->setRequestData($requestData)
-			->client
-				->GetProductSupplierInformations($this->request);
+		if (isset($this->cache['productSupplierInformation'][$requestData['SupplierID']])) {
+			$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']];
+		}
 
-		if (!isset($result->ProductSupplierInformations) OR is_object($result->ProductSupplierInformations) && !isset($result->ProductSupplierInformations->ProductSupplierInformation)) {
+
+		if (isset($requestData['ProductID'])) {
+			$productId = $requestData['ProductID'];
+			unset($requestData['ProductID']);
+		}
+
+		if (!isset($result)) {
+			$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']] = $this
+				->setRequestData($requestData)
+				->client
+					->GetProductSupplierInformations($this->request)->GetProductSupplierInformationsResult;
+		}
+
+		if (!isset($result->ProductSupplierInformations) || (is_object($result->ProductSupplierInformations) && !isset($result->ProductSupplierInformations->ProductSupplierInformation))) {
 			return [];
 		}
+
+		if (!is_array($result->ProductSupplierInformations->ProductSupplierInformation)) {
+			return [$result->ProductSupplierInformations->ProductSupplierInformation];
+		}
+
+		if (isset($productId)) {
+			$subResult = [];
+
+			foreach ($result->ProductSupplierInformations->ProductSupplierInformation AS $entry) {
+				if ($productId == $entry->ProductID) {
+					return $entry;
+				}
+			}
+
+			return $subResult;
+		}
+
 
 		return $result->ProductSupplierInformations->ProductSupplierInformation;
 	}
