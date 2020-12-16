@@ -22,7 +22,16 @@ class MyFactorySoapApi
 	{
 		$this->request['UserName'] = env('MF_SOAP_LOGIN');
 		$this->request['Password'] = env('MF_SOAP_PASSWORD');
-		$this->client = new \SoapClient(env('MF_SOAP_WSDL'), ['trace' => true]);
+		$this->client = new \SoapClient(
+			env('MF_SOAP_WSDL'),
+			[
+			    'trace' => true, 
+			    'keep_alive' => false,
+			    'connection_timeout' => 5000,
+			    'cache_wsdl' => WSDL_CACHE_NONE,
+			    'compression'   => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+			]
+		);
 
 		return $this;
 	}
