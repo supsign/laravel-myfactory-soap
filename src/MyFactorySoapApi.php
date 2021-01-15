@@ -336,12 +336,11 @@ class MyFactorySoapApi
 		return $this;
     }
 
-    public function updateProductSupplierInformation(array $requestData, $put = false)
+    public function updateProductSupplierInformation(array $requestData)
     {
-    	$this->setRequestData($requestData);
-			->response = $put
-				? $this->client->PutProductSupplierInformation($this->request)
-				: $this->client->UpdateProduct($this->request);
+    	$this
+    		->setRequestData(['ProductSupplierInformation' => $requestData])
+			->response = $this->client->PutProductSupplierInformation($this->request);
 
 		return $this;
     }
