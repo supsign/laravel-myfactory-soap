@@ -326,8 +326,8 @@ class MyFactorySoapApi
     }
 
     public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
-    {    	
-		$this
+    {
+    	$this
 			->setRequestData(['Product' => $requestData])
 			->response = $put
 				? $this->client->PutProduct($this->request)
