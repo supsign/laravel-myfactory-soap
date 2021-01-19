@@ -74,6 +74,13 @@ class MyFactorySoapApi
 		return $this->response->GetCountriesResult->Countries->Country;
 	}
 
+	public function getCategories()
+	{
+		$this->response = $this->client->GetProductGroups($this->request);
+
+		return $this->response->GetProductGroupsResult->ProductGroups->ProductGroup;
+	}
+
 	public function getDiscountLists()
 	{
 		$this->response = $this->client->GetDiscountLists($this->request);
@@ -327,6 +334,10 @@ class MyFactorySoapApi
 
     public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
     {
+    	if (isset($requestData['ProductDesc'])) {
+    		$this->setRequestData(['ProductDesc' => $requestData['ProductDesc']]);
+    	}
+
     	$this
 			->setRequestData(['Product' => $requestData])
 			->response = $put
