@@ -77,8 +77,15 @@ class MyFactorySoapApi
 	public function getCategories()
 	{
 		$this->response = $this->client->GetProductGroups($this->request);
-
+		
 		return $this->response->GetProductGroupsResult->ProductGroups->ProductGroup;
+	}
+
+	public function getProductDimensions()
+	{
+		$this->response = $this->client->GetProductDimensions($this->request);
+
+		return $this->response->GetProductDimensionsResult->Dimensions->Dimension;
 	}
 
 	public function getDiscountLists()
