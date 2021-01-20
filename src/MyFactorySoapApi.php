@@ -300,6 +300,13 @@ class MyFactorySoapApi
 		return $this->cache['taxation'] = $this->response->GetTaxationsResult->Taxations->Taxation;
 	}
 
+	protected function addRequestData(array $data)
+	{
+    	$this->request = array_merge($this->request, $data);
+
+    	return $this;
+	}
+
     protected function setRequestData(array $data)
     {
     	$this
@@ -334,15 +341,19 @@ class MyFactorySoapApi
 
     public function updateProduct(array $requestData, $put = false)			//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
     {
-    	if (isset($requestData['ProductDesc'])) {
-    		$this->setRequestData(['ProductDesc' => $requestData['ProductDesc']]);
+    	$this->setRequestData(['Product' => $requestData]);
+
+    	if (isset($requestData['ProductDescs'])) {
+    		$this->addRequestData(['ProductDescs' => array($requestData['ProductDescs'])]);
     	}
 
-    	$this
-			->setRequestData(['Product' => $requestData])
-			->response = $put
-				? $this->client->PutProduct($this->request)
-				: $this->setProductUpdateDefaultRequestData()->client->UpdateProduct($this->request);
+    	if (isset($requestData['Attributes'])) {
+    		$this->addRequestData(['Attributes' => array($requestData['Attributes'])]);
+    	}
+
+		$this->response = $put
+			? $this->client->PutProduct($this->request)
+			: $this->setProductUpdateDefaultRequestData()->client->UpdateProduct($this->request);
 
 		return $this;
     }
