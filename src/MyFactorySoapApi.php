@@ -160,7 +160,7 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
-	public function getProductSupplierInformationDebug(array $requestData)
+	public function getProductSupplierInformation(array $requestData)
 	{
 		if (!isset($requestData['SupplierID']) OR !isset($requestData['Products'])) {
 			throw new \Exception('missing request parameter', 1);
