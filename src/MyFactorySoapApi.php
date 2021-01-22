@@ -129,11 +129,11 @@ class MyFactorySoapApi
 					die();
 				}
 
-				return $this->response->GetProductByProductIDResult->Product;
+				return $this->cache['Product'][$this->request['ProductID']] = $this->response->GetProductByProductIDResult->Product;
 
 			case array_key_exists('ProductNumber', $this->request):
 				$this->response = $this->client->GetProductByProductNumber($this->request);
-				return $this->response->GetProductByProductNumberResult->Product;
+				return $this->cache['Product'][$this->response->GetProductByProductNumberResult->Product->ProductID] = $this->response->GetProductByProductNumberResult->Product;
 
 			default:
 				throw new \Exception($this->error['missing_parameter'], 1);
@@ -160,49 +160,16 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
-	public function getProductSupplierInformation(array $requestData)
+	public function getProductSupplierInformationDebug(array $requestData)
 	{
-		if (!isset($requestData['SupplierID'])) {
+		if (!isset($requestData['SupplierID']) OR !isset($requestData['Products'])) {
 			throw new \Exception('missing request parameter', 1);
 		}
 
-		if (isset($this->cache['productSupplierInformation'][$requestData['SupplierID']])) {
-			$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']];
-		}
-
-
-		if (isset($requestData['ProductID'])) {
-			$productId = $requestData['ProductID'];
-			unset($requestData['ProductID']);
-		}
-
-		if (!isset($result)) {
-			$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']] = $this
-				->setRequestData($requestData)
-				->client
-					->GetProductSupplierInformations($this->request)->GetProductSupplierInformationsResult;
-		}
-
-		if (!isset($result->ProductSupplierInformations) || (is_object($result->ProductSupplierInformations) && !isset($result->ProductSupplierInformations->ProductSupplierInformation))) {
-			return [];
-		}
-
-		if (!is_array($result->ProductSupplierInformations->ProductSupplierInformation)) {
-			return [$result->ProductSupplierInformations->ProductSupplierInformation];
-		}
-
-		if (isset($productId)) {
-			$subResult = [];
-
-			foreach ($result->ProductSupplierInformations->ProductSupplierInformation AS $entry) {
-				if ($productId == $entry->ProductID) {
-					return $entry;
-				}
-			}
-
-			return $subResult;
-		}
-
+		$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']] = $this
+			->setRequestData($requestData)
+			->client
+				->GetProductSupplierInformations($this->request)->GetProductSupplierInformationsResult;
 
 		return $result->ProductSupplierInformations->ProductSupplierInformation;
 	}
