@@ -166,7 +166,11 @@ class MyFactorySoapApi
 			throw new \Exception('missing request parameter', 1);
 		}
 
-		$result = $this							//	$this->cache['productSupplierInformation'][$requestData['SupplierID']]
+		if (isset($this->cache['productSupplierInformation'][$requestData['SupplierID']][$this->request['Product']['ProductID']])) {
+			return $this->cache['productSupplierInformation'][$requestData['SupplierID']][$this->request['Product']['ProductID']];
+		}
+
+		$result = $this->cache['productSupplierInformation'][$requestData['SupplierID']][$this->request['Product']['ProductID']] =  $this							//	
 			->setRequestData($requestData)
 			->client
 				->GetProductSupplierInformations($this->request)->GetProductSupplierInformationsResult;
