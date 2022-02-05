@@ -3,6 +3,7 @@
 namespace Supsign\LaravelMfSoap;
 
 use Config;
+use Exception;
 
 class MyFactorySoapApi
 {
@@ -125,8 +126,7 @@ class MyFactorySoapApi
 				$this->response = $this->client->GetProductByProductID($this->request);
 
 				if (!isset($this->response->GetProductByProductIDResult->Product)) {
-					var_dump($requestData, $this->response);
-					die();
+					throw new Exception('no Product Object was returned for '.$this->request['ProductID']);
 				}
 
 				return $this->cache['Product'][$this->request['ProductID']] = $this->response->GetProductByProductIDResult->Product;
