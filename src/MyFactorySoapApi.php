@@ -2,7 +2,6 @@
 
 namespace Supsign\LaravelMfSoap;
 
-use Config;
 use Exception;
 
 class MyFactorySoapApi
@@ -39,7 +38,7 @@ class MyFactorySoapApi
 
 	protected function clearRequestData() 
 	{
-		foreach ($this->request AS $key => $value) {
+		foreach (array_keys($this->request) AS $key) {
 			if ($key == 'UserName' OR $key == 'Password') {
 				continue;
 			}
@@ -48,6 +47,13 @@ class MyFactorySoapApi
 		}
 
 		return $this;
+	}
+
+	public function createSalesOrder(array $requestData = [])
+	{
+		$this->setRequestData(['Order' => $requestData]);
+
+		return $this->client->CreateSalesOrder($this->request);
 	}
 
 	public function createProduct(array $requestData)					//	keys: Product[ProductID, ProductNumber, Name1, Name2, ...]
@@ -77,9 +83,13 @@ class MyFactorySoapApi
 
 	public function getCategories()
 	{
+		if (isset($this->cache['categories'])) {
+			return $this->cache['categories'];
+		}
+
 		$this->response = $this->client->GetProductGroups($this->request);
 		
-		return $this->response->GetProductGroupsResult->ProductGroups->ProductGroup;
+		return $this->cache['categories'] = $this->response->GetProductGroupsResult->ProductGroups->ProductGroup;
 	}
 
 	public function getProductDimensions()
