@@ -74,13 +74,6 @@ class MyFactorySoapApi
 		return $this->response;
 	}
 
-	public function getCountries()
-	{
-		$this->response = $this->client->GetCountries($this->request);
-
-		return $this->response->GetCountriesResult->Countries->Country;
-	}
-
 	public function getCategories()
 	{
 		if (isset($this->cache['categories'])) {
@@ -90,6 +83,22 @@ class MyFactorySoapApi
 		$this->response = $this->client->GetProductGroups($this->request);
 		
 		return $this->cache['categories'] = $this->response->GetProductGroupsResult->ProductGroups->ProductGroup;
+	}
+
+	public function getCountries()
+	{
+		$this->response = $this->client->GetCountries($this->request);
+
+		return $this->response->GetCountriesResult->Countries->Country;
+	}
+
+	public function getCustomer(array $requestData = [])
+	{
+		$this->response = $this
+			->setRequestData($requestData)
+			->client->GetCustomer($this->request);
+
+		return $this->response->GetCustomerResult->Customer;
 	}
 
 	public function getProductDimensions()
