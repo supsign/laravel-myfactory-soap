@@ -101,6 +101,13 @@ class MyFactorySoapApi
 		return $this->response->GetCustomerResult->Customer;
 	}
 
+	public function getCustomers()
+	{
+		$this->response = $this->client->GetCustomers($this->request);
+
+		return $this->response->GetCustomersResult->Customers->Customer;
+	}
+
 	public function getProductDimensions()
 	{
 		$this->response = $this->client->GetProductDimensions($this->request);
