@@ -3,6 +3,7 @@
 namespace Supsign\LaravelMfSoap;
 
 use Exception;
+use stdClass;
 
 class MyFactorySoapApi
 {
@@ -143,12 +144,16 @@ class MyFactorySoapApi
 		return $this->response->GetPriceListsResult->PriceLists->PriceList;
 	}
 
-	public function getProduct(array $requestData) 						// keys:	ProductID, ProductNumber
+	public function getProduct(array $requestData): stdClass	// keys:	ProductID, ProductNumber
 	{					
 		$this->setRequestData($requestData);
 
 		switch (true) {
 			case array_key_exists('ProductID', $this->request):
+				if (!empty($this->cache['Product'][$this->request['ProductID']])) {
+					return $this->cache['Product'][$this->request['ProductID']];
+				}
+
 				$this->response = $this->client->GetProductByProductID($this->request);
 
 				if (!isset($this->response->GetProductByProductIDResult->Product)) {
@@ -158,7 +163,12 @@ class MyFactorySoapApi
 				return $this->cache['Product'][$this->request['ProductID']] = $this->response->GetProductByProductIDResult->Product;
 
 			case array_key_exists('ProductNumber', $this->request):
+				if (!empty($this->cache['Product'][$this->response->GetProductByProductNumberResult->Product->ProductID])) {
+					return $this->cache['Product'][$this->response->GetProductByProductNumberResult->Product->ProductID];
+				}
+
 				$this->response = $this->client->GetProductByProductNumber($this->request);
+
 				return $this->cache['Product'][$this->response->GetProductByProductNumberResult->Product->ProductID] = $this->response->GetProductByProductNumberResult->Product;
 
 			default:
@@ -167,7 +177,7 @@ class MyFactorySoapApi
 	}
 
 	public function getProducts(array $requestData) 					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
-	{					
+	{
 		$this->setRequestData($requestData);
 
 		$this->response = array_key_exists('GetDocuments', $this->request)
@@ -187,7 +197,9 @@ class MyFactorySoapApi
 	}
 
 	public function getProductSupplierInformation(array $requestData)
-	{
+	{	
+		return [];
+
 		if (!isset($requestData['SupplierID']) OR !isset($requestData['Products'])) {
 			throw new \Exception('missing request parameter', 1);
 		}
