@@ -176,7 +176,7 @@ class MyFactorySoapApi
 		}
 	}
 
-	public function getProducts(array $requestData) 					// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
+	public function getProducts(array $requestData): array		// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
 	{
 		$this->setRequestData($requestData);
 
