@@ -198,8 +198,6 @@ class MyFactorySoapApi
 
 	public function getProductSupplierInformation(array $requestData)
 	{	
-		return [];
-
 		if (!isset($requestData['SupplierID']) OR !isset($requestData['Products'])) {
 			throw new \Exception('missing request parameter', 1);
 		}
