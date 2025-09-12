@@ -176,7 +176,7 @@ class MyFactorySoapApi
 		}
 	}
 
-	public function getProducts(array $requestData): array		// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
+	public function getProducts(array $requestData): array|object		// keys:	ChangeDate, Products[ProductID[], ProductNumber[]], GetDocuments
 	{
 		$this->setRequestData($requestData);
 
@@ -192,6 +192,15 @@ class MyFactorySoapApi
 		$this
 			->setRequestData($requestData)
 			->response = $this->client->GetProductStockInfos($this->request);
+
+		return $this->response;
+	}
+
+	public function getProductStockValues(int $mfProductId): object
+	{
+		$this
+			->setRequestData(['ProductID' => $mfProductId])
+			->response = $this->client->GetProductStockValues($this->request);
 
 		return $this->response;
 	}
