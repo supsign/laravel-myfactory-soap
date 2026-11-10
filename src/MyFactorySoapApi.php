@@ -13,9 +13,11 @@ class MyFactorySoapApi
         // $client = null,
         $cache = array(),
         $error = array('missing_parameter' => 'missing request parameter'),
+        $product = null,
         $request = array(),
         $requiredFields	= array(
-        	'ProductUpdate' => ['ProductID', 'ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight']
+        	'ProductUpdate' => ['ProductID', 'ProductNumber', 'InActive', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductWeight'],
+        	'ProductReactivate' => ['ProductID', 'ProductNumber', 'Name1', 'Name2', 'Matchcode', 'WeightUnit', 'ProductWeight', 'IsWebshopProduct', 'ManufacturerNumber', 'BaseUnit', 'SalesUnit', 'ProductType', 'Taxation', 'BaseDecimals', 'SalesQuantity', 'MainSupplier', 'ProductGroup']
         ),
         $response = null;
 
@@ -355,6 +357,7 @@ class MyFactorySoapApi
 			: $this->getProduct(['ProductNumber' => $this->request['Product']['ProductNumber']]);
 
 		$this->request = $tmpRequest;
+		$this->product = $product;
 
     	foreach ($this->requiredFields['ProductUpdate'] AS $field) {
     		if (!isset($this->request['Product'][$field])) {
@@ -377,12 +380,55 @@ class MyFactorySoapApi
     		$this->addRequestData(['Attributes' => array($requestData['Attributes'])]);
     	}
 
-		$this->response = $put
-			? $this->client->PutProduct($this->request)
-			: $this->setProductUpdateDefaultRequestData()->client->UpdateProduct($this->request);
+		if ($put) {
+			$this->response = $this->client->PutProduct($this->request);
+
+			return $this;
+		}
+
+		$this->setProductUpdateDefaultRequestData();
+
+		if (array_key_exists('InActive', $requestData) AND !$requestData['InActive'] AND $this->product->InActive) {
+			$this->reactivateProduct();
+		}
+
+		$this->response = $this->client->UpdateProduct($this->request);
 
 		return $this;
     }
+
+	/**
+	 * UpdateProduct nimmt InActive=false mit ResponseCode OK an, lässt den Artikel in myfactory aber
+	 * inaktiv (Stand 11/2026). Reaktivieren kann nur PutProduct, und ob das fehlende Felder leert, ist
+	 * nicht dokumentiert: darum geht der bestehende Artikel so mit, wie createProduct ihn anlegt,
+	 * Beschreibungen und Preise inklusive. Das eigentliche UpdateProduct folgt danach unverändert.
+	 */
+	protected function reactivateProduct()
+	{
+		$request = $this->request;
+		$payload = ['InActive' => 0];
+
+		foreach ($this->requiredFields['ProductReactivate'] AS $field) {
+			$payload[$field] = $this->product->{$field};
+		}
+
+		foreach (['ProductDescs' => 'ProductDesc', 'ProductPrices' => 'PriceListPrice'] AS $field => $item) {
+			if (isset($this->product->{$field}->{$item})) {
+				$payload[$field] = is_array($this->product->{$field}->{$item}) ? $this->product->{$field}->{$item} : [$this->product->{$field}->{$item}];
+			}
+		}
+
+		$result = $this->updateProduct($payload, true)->response->PutProductResult;
+		$this->request = $request;
+
+		if ($result->ResponseCode == 'ERROR') {
+			throw new Exception('PutProduct '.$this->product->ProductNumber.': '.$result->ErrMsg, 1);
+		}
+
+		$this->product->InActive = false;
+
+		return $this;
+	}
 
     public function updateProductSupplierInformation(array $requestData)
     {
